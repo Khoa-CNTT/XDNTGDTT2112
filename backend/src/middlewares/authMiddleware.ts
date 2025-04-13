@@ -36,6 +36,7 @@ export type RequestWithUser = Request & {
   user: Pick<JwtPayLoadType, 'email' | 'role' | 'registerProvider' | 'jit'>;
 };
 
+// Authentication middleware
 export const authMiddleware = async (
   req: Request,
   res: Response,
@@ -88,6 +89,31 @@ export const authMiddleware = async (
       next(error);
     }
   }
+};
+
+type RoleType = 'user' | 'instructor' | 'admin';
+
+// Authorization middleware
+export const authorizationMiddleware = (roles: RoleType[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as RequestWithUser).user;
+
+    if (!user) {
+      throw serverResponse.createError({
+        ...messages.UNAUTHORIZED,
+        message: 'Authentication is needed before authorization',
+      });
+    }
+
+    if (!roles.includes(user.role)) {
+      throw serverResponse.createError({
+        ...messages.FORBIDDEN,
+        message: 'You do not have permission to access this resource.',
+      });
+    }
+
+    next();
+  };
 };
 
 const handleRefreshToken = async (

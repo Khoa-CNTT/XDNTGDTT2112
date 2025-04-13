@@ -18,7 +18,7 @@ import { UserType } from '../models/User.js';
 import GoogleService, { GoogleUserInfo } from './GoogleService.js';
 import FacebookService, { FacebookUserInfo } from './FacebookService.js';
 import EmailService from './EmailService.js';
-import UserService from './UserService.js';
+import UserService, { UserCreateInput } from './UserService.js';
 
 // Crypto
 import crypto from 'crypto';
@@ -36,12 +36,6 @@ import {
   saveResetCodeToRedis,
 } from '../utils/redis/redisUtils.js';
 
-export type UserCreateInput = Pick<UserType, 'email' | 'name'> & {
-  password: string;
-  provider: 'local' | 'google' | 'facebook';
-  avatarUrl?: string;
-};
-
 export type UserLoginInput = {
   email?: string;
   password?: string;
@@ -52,43 +46,7 @@ export type UserLoginInput = {
 
 const AuthService = {
   register: async function (data: UserCreateInput) {
-    const existedUser = await UserService.getUserByEmailWithPasswordHash(
-      data.email
-    );
-
-    if (existedUser) {
-      const providerMessages = {
-        google:
-          'Your account is connected to Google. Please log in with Google.',
-        facebook:
-          'Your account is connected to Facebook. Please log in with Facebook',
-        default: 'Account already exists.',
-      };
-
-      const provider =
-        existedUser.registerProvider as keyof typeof providerMessages;
-
-      const message = providerMessages[provider] || providerMessages.default;
-
-      throw serverResponse.createError({
-        ...messages.ALREADY_EXISTS,
-        message,
-      });
-    }
-
-    let passwordHash = '';
-    if (data.provider === 'local') {
-      passwordHash = bcrypt.hashSync(data.password, 10);
-    }
-
-    const newUser = await UserService.createUser({
-      email: data.email,
-      name: data.name,
-      passwordHash,
-      registerProvider: data.provider,
-      avatarUrl: data?.avatarUrl || '',
-    });
-
+    const newUser = await UserService.createUser(data);
     return newUser;
   },
   login: async function (res: Response, data: UserLoginInput) {
@@ -219,6 +177,7 @@ const AuthService = {
           existedUser = await this.register({
             email,
             name,
+            bio: '',
             avatarUrl,
             password: '',
             provider: data.provider,

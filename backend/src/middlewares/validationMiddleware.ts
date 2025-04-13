@@ -18,6 +18,18 @@ const PATTERNS = {
   PASSWORD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,24}$/,
 };
 
+enum UserRole {
+  USER = 'user',
+  INSTRUCTOR = 'instructor',
+  ADMIN = 'admin',
+}
+
+enum UserProvider {
+  LOCAL = 'local',
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+}
+
 /**
  * Validates user registration data
  */
@@ -73,6 +85,31 @@ export const validateRegister = (
       field: 'password',
       message:
         'Password must be 6-24 characters and include at least 1 lowercase, 1 uppercase, and 1 special character.',
+    };
+  }
+
+  if (
+    data.role !== undefined &&
+    !errorResponse.errors['role'] &&
+    UserRole[data.role.toUpperCase() as keyof typeof UserRole] === undefined
+  ) {
+    errorResponse.errors['role'] = {
+      field: 'role',
+      message:
+        'Invalid role. Role must be one of the following: user, instructor, admin.',
+    };
+  }
+
+  if (
+    data.provider !== undefined &&
+    !errorResponse.errors['provider'] &&
+    UserProvider[data.provider.toUpperCase() as keyof typeof UserProvider] ===
+      undefined
+  ) {
+    errorResponse.errors['provider'] = {
+      field: 'provider',
+      message:
+        'Invalid provider. Provider must be one of the following: local, google, facebook.',
     };
   }
 
