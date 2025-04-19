@@ -1,6 +1,11 @@
+// React router
 import { createBrowserRouter } from 'react-router-dom';
+
+// Layouts
 import RootLayout from '@/layouts/RootLayout';
-import Home from '@pages/Home';
+
+// Pages
+import Home from '@/pages/Home';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +31,13 @@ const router = createBrowserRouter([
         },
       },
       {
+        path: '/account',
+        lazy: async () => {
+          const { default: Component } = await import('@pages/Account');
+          return { Component };
+        },
+      },
+      {
         path: '/cart',
         lazy: async () => {
           const { default: Component } = await import('@pages/Cart');
@@ -33,9 +45,16 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: '/account',
+        path: '/source',
         lazy: async () => {
-          const { default: Component } = await import('@pages/Account');
+          const { default: Component } = await import('@/pages/CourceList');
+          return { Component };
+        },
+      },
+      {
+        path: '/course/:id',
+        lazy: async () => {
+          const { default: Component } = await import('@pages/CourseDetail');
           return { Component };
         },
       },

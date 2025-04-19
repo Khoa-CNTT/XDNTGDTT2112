@@ -1,154 +1,183 @@
-import { FaTwitter, FaInstagram, FaFacebook } from 'react-icons/fa';
-import { useTheme } from '@/hooks/useTheme'; // Import custom hook useTheme
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  Link,
+  IconButton,
+} from '@mui/material';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import { useTheme } from '@/hooks/useTheme';
 
 export const Footer = () => {
-  const { theme } = useTheme(); // Lấy theme từ useTheme hook
+  const { themeMode } = useTheme(); // Sửa: lấy themeMode thay vì theme
+  const isDark = themeMode === 'dark';
 
   return (
-    <footer
-      className={`py-12 ${
-        theme === 'dark' ? 'dark bg-gray-950' : 'bg-black'
-      } text-white`}
+    <Box
+      component="footer"
+      sx={{
+        py: { xs: 4, md: 6 }, // Giảm padding trên mobile
+        bgcolor: isDark ? 'grey.900' : 'grey.800', // Sử dụng màu từ theme
+        color: 'common.white',
+      }}
     >
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Logo */}
-          <div>
-            <h3 className="text-2xl font-bold text-purple-500 mb-4">
-              EduGenlus
-            </h3>
-            <p className="text-gray-400 text-sm">
-              Copyright ©VAeducation2025
-            </p>
-          </div>
+      <Container maxWidth="lg">
+  <Grid
+    container
+    spacing={{ xs: 3, md: 4 }}
+    justifyContent="space-between"
+    alignItems="flex-start"
+  >
+    {/* Logo & Copyright */}
+    <Grid item xs={12} sm={6} md={3}>
+      <Typography
+        variant="h6"
+        fontWeight="bold"
+        color="secondary"
+        gutterBottom
+        sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' } }}
+      >
+        EduGenlus
+      </Typography>
+      <Typography
+        variant="body2"
+        color="grey.400"
+        sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
+      >
+        Copyright ©VAeducation2025
+      </Typography>
+    </Grid>
 
-          {/* Cột 1: Programming */}
-          <div>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Web Programming
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Mobile Programming
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Java A-Z
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  PHP A-Z
-                </a>
-              </li>
-            </ul>
-          </div>
+    {/* Programming */}
+    <Grid item xs={12} sm={6} md={3}>
+      <Typography
+        variant="subtitle1"
+        fontWeight="medium"
+        gutterBottom
+        sx={{ color: 'common.white', fontSize: { xs: '0.9rem', md: '1rem' } }}
+      >
+        Lập trình
+      </Typography>
+      <Box display="flex" flexDirection="column" gap={{ xs: 0.5, md: 1 }}>
+        {['Web Programming', 'Mobile Programming', 'Java A-Z', 'PHP A-Z'].map((text) => (
+          <Link
+            key={text}
+            href="#"
+            underline="hover"
+            sx={{
+              color: 'grey.500',
+              fontSize: { xs: '0.8rem', md: '0.875rem' },
+              '&:hover': { color: 'common.white' },
+            }}
+          >
+            {text}
+          </Link>
+        ))}
+      </Box>
+    </Grid>
 
-          {/* Cột 2: Design */}
-          <div>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Adobe Illustrator
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Adobe Photoshop
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Design Logo
-                </a>
-              </li>
-            </ul>
-          </div>
+    {/* Design */}
+    <Grid item xs={12} sm={6} md={3}>
+      <Typography
+        variant="subtitle1"
+        fontWeight="medium"
+        gutterBottom
+        sx={{ color: 'common.white', fontSize: { xs: '0.9rem', md: '1rem' } }}
+      >
+        Thiết kế
+      </Typography>
+      <Box display="flex" flexDirection="column" gap={{ xs: 0.5, md: 1 }}>
+        {['Adobe Illustrator', 'Adobe Photoshop', 'Design Logo'].map((text) => (
+          <Link
+            key={text}
+            href="#"
+            underline="hover"
+            sx={{
+              color: 'grey.500',
+              fontSize: { xs: '0.8rem', md: '0.875rem' },
+              '&:hover': { color: 'common.white' },
+            }}
+          >
+            {text}
+          </Link>
+        ))}
+      </Box>
+    </Grid>
 
-          {/* Cột 3: Other */}
-          <div>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Chính thuật 30 ngày
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Photography
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Làm phim
-                </a>
-              </li>
-            </ul>
-            {/* Social Icons */}
-            <div className="flex space-x-4 mt-4">
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                <FaTwitter size={20} />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                <FaInstagram size={20} />
-              </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                <FaFacebook size={20} />
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+    {/* Other + Social */}
+    <Grid item xs={12} sm={6} md={3}>
+      <Typography
+        variant="subtitle1"
+        fontWeight="medium"
+        gutterBottom
+        sx={{ color: 'common.white', fontSize: { xs: '0.9rem', md: '1rem' } }}
+      >
+        Khác
+      </Typography>
+      <Box display="flex" flexDirection="column" gap={{ xs: 0.5, md: 1 }}>
+        {['Chính thuật 30 ngày', 'Photography', 'Làm phim'].map((text) => (
+          <Link
+            key={text}
+            href="#"
+            underline="hover"
+            sx={{
+              color: 'grey.500',
+              fontSize: { xs: '0.8rem', md: '0.875rem' },
+              '&:hover': { color: 'common.white' },
+            }}
+          >
+            {text}
+          </Link>
+        ))}
+      </Box>
+
+      {/* Social Icons */}
+      <Box mt={{ xs: 1.5, md: 2 }} display="flex" gap={{ xs: 1, md: 2 }}>
+        <IconButton
+          href="https://twitter.com"
+          target="_blank"
+          rel="noopener"
+          sx={{
+            color: 'grey.500',
+            '&:hover': { color: 'white' },
+            p: { xs: 0.5, md: 1 },
+          }}
+        >
+          <TwitterIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          href="https://instagram.com"
+          target="_blank"
+          rel="noopener"
+          sx={{
+            color: 'grey.500',
+            '&:hover': { color: 'white' },
+            p: { xs: 0.5, md: 1 },
+          }}
+        >
+          <InstagramIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          href="https://facebook.com"
+          target="_blank"
+          rel="noopener"
+          sx={{
+            color: 'grey.500',
+            '&:hover': { color: 'white' },
+            p: { xs: 0.5, md: 1 },
+          }}
+        >
+          <FacebookIcon fontSize="small" />
+        </IconButton>
+      </Box>
+    </Grid>
+  </Grid>
+</Container>
+
+    </Box>
   );
 };
 

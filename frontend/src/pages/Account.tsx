@@ -1,197 +1,236 @@
-// Account.tsx
-// React
 import { useState } from 'react';
-
-// Hooks
+import {
+  Container,
+  Typography,
+  Tabs,
+  Tab,
+  Box,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Button,
+  Avatar,
+  Card,
+  CardContent,
+  CircularProgress,
+} from '@mui/material';
 import { useTheme } from '@/hooks/useTheme';
-
-// Components
 import Footer from '@/components/Footer';
 
+const tabs = [
+  'Hồ sơ',
+  'Tài khoản',
+  'Phương thức thanh toán',
+  'Thông báo',
+  'Sửa riêng tư',
+];
+
+type FormData = {
+  fullName: string;
+  familyName: string;
+  title: string;
+  link: string;
+};
+
+type Errors = {
+  fullName: string;
+  link: string;
+};
+
 export default function Account() {
-  const { theme } = useTheme(); // Lấy theme từ useTheme hook
-  const [language, setLanguage] = useState('English'); // Ngôn ngữ mặc định
-  const [activeTab, setActiveTab] = useState('Hồ sơ'); // Tab mặc định
+  const { themeMode } = useTheme();
+  const isDark = themeMode === 'dark';
 
-  // Danh sách các tab
-  const tabs = [
-    'Hồ sơ',
-    'Tài khoản',
-    'Phương thức thanh toán',
-    'Thông báo',
-    'Sửa riêng tư',
-  ];
+  const [activeTab, setActiveTab] = useState(0);
+  const [language, setLanguage] = useState('English');
+  const [loading, setLoading] = useState(false);
 
-  // Hàm xử lý khi nhấn nút "Lưu lại"
-  const handleSave = () => {
-    console.log('Saving user data...');
-    // Thêm logic lưu dữ liệu tại đây (gọi API, lưu vào state, v.v.)
+  const [formData, setFormData] = useState<FormData>({
+    fullName: '',
+    familyName: '',
+    title: '',
+    link: '',
+  });
+
+  const [errors, setErrors] = useState<Errors>({
+    fullName: '',
+    link: '',
+  });
+
+  const handleChange = (field: keyof FormData) => 
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: event.target.value }));
+      if (errors[field as keyof Errors]) {
+        setErrors((prev) => ({ ...prev, [field]: '' }));
+      }
+    };
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors: Errors = { fullName: '', link: '' };
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'Tên đầy đủ không được để trống';
+      valid = false;
+    }
+
+    const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/;
+    if (formData.link && !urlRegex.test(formData.link)) {
+      newErrors.link = 'Liên kết không hợp lệ (phải bắt đầu bằng http:// hoặc https://)';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) return;
+    setLoading(true);
+    try {
+      await new Promise((res) => setTimeout(res, 1000));
+      console.log('Saving user data:', formData);
+    } catch (error) {
+      console.error('Save error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 0:
+        return (
+          <Card sx={{ bgcolor: isDark ? 'grey.800' : 'background.paper' }}>
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <Avatar
+                  src="https://media.techz.vn/resize_x355x/media2019/source/Nhung-do/A-Son-Tung-MTP/Son-Tung-MTP-lo-anh-dung-do-doi-voi-Thieu-Bao-Tram-9.jpg"
+                  alt="User Avatar"
+                  sx={{ width: 100, height: 100 }}
+                />
+              </Box>
+
+              <TextField
+                label="Tên đầy đủ"
+                fullWidth
+                value={formData.fullName}
+                onChange={handleChange('fullName')}
+                error={!!errors.fullName}
+                helperText={errors.fullName}
+                sx={{ '& .MuiOutlinedInput-root': { bgcolor: isDark ? 'grey.700' : 'white' } }}
+              />
+              <TextField
+                label="Họ đệm"
+                fullWidth
+                value={formData.familyName}
+                onChange={handleChange('familyName')}
+                sx={{ '& .MuiOutlinedInput-root': { bgcolor: isDark ? 'grey.700' : 'white' } }}
+              />
+              <TextField
+                label="Tiêu đề"
+                fullWidth
+                value={formData.title}
+                onChange={handleChange('title')}
+                sx={{ '& .MuiOutlinedInput-root': { bgcolor: isDark ? 'grey.700' : 'white' } }}
+              />
+              <FormControl fullWidth>
+                <InputLabel>Ngôn ngữ</InputLabel>
+                <Select
+                  value={language}
+                  label="Ngôn ngữ"
+                  onChange={(e) => setLanguage(e.target.value)}
+                  sx={{ bgcolor: isDark ? 'grey.700' : 'white' }}
+                >
+                  <MenuItem value="English">English</MenuItem>
+                  <MenuItem value="Vietnamese">Vietnamese</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label="Liên kết"
+                fullWidth
+                value={formData.link}
+                onChange={handleChange('link')}
+                error={!!errors.link}
+                helperText={errors.link}
+                sx={{ '& .MuiOutlinedInput-root': { bgcolor: isDark ? 'grey.700' : 'white' } }}
+              />
+              <Box textAlign="center">
+                <Button
+                  onClick={handleSave}
+                  variant="contained"
+                  disabled={loading}
+                  startIcon={loading && <CircularProgress size={20} />}
+                  sx={{ px: 4, py: 1.5 }}
+                >
+                  {loading ? 'Đang lưu...' : 'Lưu lại'}
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        );
+
+      default:
+        return (
+          <Card sx={{ bgcolor: isDark ? 'grey.800' : 'background.paper' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>{tabs[activeTab]}</Typography>
+              <Typography variant="body1" color="text.secondary">
+                Chức năng này hiện chưa triển khai.
+              </Typography>
+            </CardContent>
+          </Card>
+        );
+    }
   };
 
   return (
-    <div
-      className={`min-h-screen flex flex-col ${
-        theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'
-      }`}
+    <Box
+      sx={{
+        bgcolor: isDark ? 'grey.900' : 'grey.100',
+        color: isDark ? 'common.white' : 'text.primary',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     >
-      {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto">
-        {/* Tiêu đề */}
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center sm:text-left">
+      <Container maxWidth="lg" sx={{ py: 4, flex: 1 }}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center">
           Tài khoản của tôi
-        </h1>
+        </Typography>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap justify-center sm:justify-start space-x-4 sm:space-x-6 lg:space-x-10 mb-4 sm:mb-6">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-1 text-sm sm:text-base ${
-                activeTab === tab
-                  ? 'text-teal-500 border-b-2 border-teal-500'
-                  : theme === 'dark'
-                  ? 'text-gray-400'
-                  : 'text-gray-500'
-              } mb-2 sm:mb-0`} // Thêm margin-bottom cho mobile khi tabs wrap
-            >
-              {tab}
-            </button>
+        <Tabs
+          value={activeTab}
+          onChange={(e, newVal) => setActiveTab(newVal)}
+          variant="fullWidth"
+          textColor="primary"
+          indicatorColor="primary"
+          sx={{
+            mb: 4,
+            bgcolor: isDark ? 'grey.800' : 'background.paper',
+            borderRadius: 1,
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 'medium',
+              fontSize: '1rem',
+              py: 2,
+            },
+            '& .MuiTabs-indicator': {
+              height: 3,
+            },
+          }}
+        >
+          {tabs.map((tab, i) => (
+            <Tab label={tab} key={i} />
           ))}
-        </div>
+        </Tabs>
 
-        {/* Form thông tin người dùng */}
-        <div>
-          {/* Tên dự án và Avatar */}
-          <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-4 sm:mb-6">
-            <div className="relative">
-              {/* Thay bằng hình ảnh thực tế nếu có */}
-              <img
-                src="https://media.techz.vn/resize_x355x/media2019/source/Nhung-do/A-Son-Tung-MTP/Son-Tung-MTP-lo-anh-dung-do-doi-voi-Thieu-Bao-Tram-9.jpg" // Thay bằng đường dẫn hình ảnh thực tế
-                alt="User Avatar"
-                className="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] rounded-full"
-              />
-              <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-7 sm:h-7 bg-black rounded-full flex items-center justify-center">
-                <span className="text-xs sm:text-sm text-white">✏️</span>
-              </div>
-            </div>
-            <div className="flex-1 w-full sm:w-auto">
-              <label
-                className={`block text-sm sm:text-base font-medium ${
-                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                }`}
-              >
-                Tên đầy đủ
-              </label>
-              <input
-                type="text"
-                defaultValue=""
-                className={`w-full p-2 sm:p-3 border rounded-sm focus:outline-none focus:ring-1 focus:ring-teal-500 ${
-                  theme === 'dark'
-                    ? 'bg-gray-800 border-gray-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-800'
-                }`}
-              />
-            </div>
-          </div>
+        {renderTabContent()}
+      </Container>
 
-          {/* Họ đệm */}
-          <div className="mb-4">
-            <label
-              className={`block text-sm sm:text-base font-medium ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Họ đệm
-            </label>
-            <input
-              type="text"
-              defaultValue=""
-              className={`w-full p-2 sm:p-3 border rounded-sm focus:outline-none focus:ring-1 focus:ring-teal-500 ${
-                theme === 'dark'
-                  ? 'bg-gray-800 border-gray-600 text-white'
-                  : 'bg-white border-gray-300 text-gray-800'
-              }`}
-            />
-          </div>
-
-          {/* Tiêu đề */}
-          <div className="mb-4">
-            <label
-              className={`block text-sm sm:text-base font-medium ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Tiêu đề
-            </label>
-            <input
-              type="text"
-              defaultValue=""
-              className={`w-full p-2 sm:p-3 border rounded-sm focus:outline-none focus:ring-1 focus:ring-teal-500 ${
-                theme === 'dark'
-                  ? 'bg-gray-800 border-gray-600 text-white'
-                  : 'bg-white border-gray-300 text-gray-800'
-              }`}
-            />
-          </div>
-
-          {/* Ngôn ngữ */}
-          <div className="mb-4">
-            <label
-              className={`block text-sm sm:text-base font-medium ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Ngôn ngữ
-            </label>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className={`w-full p-2 sm:p-3 border rounded-sm focus:outline-none focus:ring-1 focus:ring-teal-500 appearance-auto ${
-                theme === 'dark'
-                  ? 'bg-gray-800 border-gray-600 text-white'
-                  : 'bg-white border-gray-300 text-gray-800'
-              }`}
-            >
-              <option value="English">English</option>
-              <option value="Vietnamese">Vietnamese</option>
-            </select>
-          </div>
-
-          {/* Liên kết */}
-          <div className="mb-4 sm:mb-6">
-            <label
-              className={`block text-sm sm:text-base font-medium ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Liên kết
-            </label>
-            <input
-              type="text"
-              defaultValue="va.com"
-              className={`w-full p-2 sm:p-3 border rounded-sm focus:outline-none focus:ring-1 focus:ring-teal-500 ${
-                theme === 'dark'
-                  ? 'bg-gray-800 border-gray-600 text-white'
-                  : 'bg-white border-gray-300 text-gray-800'
-              }`}
-            />
-          </div>
-
-          {/* Nút Lưu lại */}
-          <div className="flex justify-center sm:justify-start">
-            <button
-              onClick={handleSave}
-              className="bg-[#8B5CF6] text-white px-6 sm:px-8 py-2 sm:py-3 rounded-md hover:bg-[#7C3AED] transition"
-            >
-              Lưu lại
-            </button>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
       <Footer />
-    </div>
+    </Box>
   );
 }

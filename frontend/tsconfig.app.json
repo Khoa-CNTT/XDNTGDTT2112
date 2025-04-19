@@ -42,6 +42,7 @@
       "@mocks/*": ["./src/mocks/*"],
       "@config/*": ["./src/config/*"],
       "@features/*": ["./src/features/*"],
+      "@theme/*": ["./src/theme/*"],
       "@env/*": ["./src/env/*"]
     }
   },

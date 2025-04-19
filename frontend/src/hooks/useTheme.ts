@@ -5,7 +5,7 @@ import {
 import { useAppDispatch, useAppSelector } from './useStore';
 
 export const useTheme = () => {
-  const theme = useAppSelector(themeModeSelector);
+  const themeMode = useAppSelector(themeModeSelector);
   const dispatch = useAppDispatch();
 
   const toggleTheme = () => {
@@ -13,7 +13,7 @@ export const useTheme = () => {
   };
 
   return {
-    theme,
+    themeMode,
     toggleTheme,
   };
 };
