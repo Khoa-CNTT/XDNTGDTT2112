@@ -6,8 +6,8 @@ import { getCartFromLocalStorage } from "./localStorage";
 export const syncCart = async () => {
   const [enrollments, cart] = await Promise.all([getEnrollments(), getCart()]);
 
-  const enrolledCourseIds = (enrollments as any[]).map((item) => item.courseId);
-  const cartCourseIds = (cart as any[]).map((item) => item.courseId);
+  const enrolledCourseIds = enrollments.data.map((item: any) => item.courseId);
+  const cartCourseIds = cart.data.map((item: any) => item.courseId);
 
   const localCart = getCartFromLocalStorage();
 

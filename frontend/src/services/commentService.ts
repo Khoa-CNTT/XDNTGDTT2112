@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "@/configs/axiosConfig";
 
 interface CreateCommentData {
@@ -10,8 +9,8 @@ interface CreateCommentData {
 export const createComment = async (data: CreateCommentData) => {
   try {
     const response = await axios.post("/comments", data);
-    return response as any;
+    return response.data;
   } catch (error) {
-    return error;
+    console.error(error);
   }
 };

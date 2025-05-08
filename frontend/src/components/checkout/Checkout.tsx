@@ -43,9 +43,7 @@ export default function Checkout() {
       const res: any = await getPaymentUrl({
         bankCode,
       });
-      console.log(res);
-      const data = res.data;
-      window.open(data.url, "_self");
+      window.open(res.data.url, "_self");
     } else {
       navigate(`/login?redirectUrl=/cart`);
     }
@@ -62,8 +60,8 @@ export default function Checkout() {
 
     async function fetchEnrollmentsAndSyncCart() {
       try {
-        const enrollments = await getEnrollments();
-        dispatch(setEnrollments(enrollments ?? []));
+        const res = await getEnrollments();
+        dispatch(setEnrollments(res.data ?? []));
       } catch (error) {
         console.error(error);
       }

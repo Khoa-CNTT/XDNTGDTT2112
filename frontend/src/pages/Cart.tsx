@@ -119,13 +119,13 @@ const Cart: React.FC = () => {
                   <CardMedia
                     component="img"
                     sx={{
-                      width: 80,
-                      height: 48,
-                      objectFit: "cover",
+                      width: "100px",
+                      height: "100px",
+                      objectFit: "contain",
                       borderRadius: 1,
                       mr: 2,
                     }}
-                    image={"/images/image-placeholder.png"}
+                    image={item.thumbnail || "/images/image-placeholder.png"}
                     alt={item.title}
                   />
 

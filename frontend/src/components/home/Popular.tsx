@@ -9,7 +9,7 @@ import { get20PopularCourses } from "@/services/courseService";
 import { Course } from "@/types";
 
 export default function Popular() {
-  const { data, isLoading } = useQuery({
+  const { data: res, isLoading } = useQuery({
     queryKey: ["popularCourses"],
     queryFn: get20PopularCourses,
   });
@@ -17,7 +17,7 @@ export default function Popular() {
   return (
     <>
       {!isLoading && (
-        <CourseSection title="Phổ biến" courses={data as Course[]} />
+        <CourseSection title="Phổ biến" courses={res.data as Course[]} />
       )}
     </>
   );

@@ -106,7 +106,10 @@ function CartItem({ course }: { course: Course }) {
             overflow: "hidden",
           }}
         >
-          <Image src="/images/image-placeholder.png" fill />
+          <Image
+            src={course.thumbnail || "/images/image-placeholder.png"}
+            fill
+          />
         </Box>
         <Stack direction={"column"} gap={"6px"}>
           <TwoLineTypography sx={{ fontSize: "0.9rem" }} variant="body1">

@@ -9,20 +9,18 @@ export const changePassword = async (
       newPassword,
       oldPassword,
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error resetting password:", error);
-    return error;
   }
 };
 
 export const sendCodeToEmail = async (email: string) => {
   try {
     const response = await axios.post("/forgot-password", { email });
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error sending code to email:", error);
-    return error;
   }
 };
 
@@ -32,10 +30,9 @@ export const verifyCode = async (email: string, code: number) => {
       email,
       resetCode: code,
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error verifying code:", error);
-    return error;
   }
 };
 
@@ -48,9 +45,8 @@ export const resetPassword = async (
       resetToken,
       password: newPassword,
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error resetting password:", error);
-    return error;
   }
 };

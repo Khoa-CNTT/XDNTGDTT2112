@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // MUI
 import { styled, alpha } from "@mui/material/styles";
 import {
@@ -77,11 +78,13 @@ export default function SearchBar({ sx }: Props) {
 
   const navigate = useNavigate();
 
-  const { data, isLoading } = useQuery({
+  const { data: res, isLoading } = useQuery({
     queryKey: ["search", query],
     queryFn: () => getCoursesByQuery(query),
     enabled: !!query,
   });
+
+  const data = res?.data || [];
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -205,7 +208,7 @@ export default function SearchBar({ sx }: Props) {
               overflowY: "auto",
             }}
           >
-            {data.map((item) => (
+            {data.map((item: any) => (
               <ListItemButton key={item._id}>
                 <SearchItem course={item} onClose={handleClose} />
               </ListItemButton>
@@ -247,7 +250,7 @@ function SearchItem({ course, onClose }: SearchItemProps) {
           overflow: "hidden",
         }}
       >
-        <Image src="/images/image-placeholder.png" fill />
+        <Image src={course.thumbnail || "/images/image-placeholder.png"} fill />
       </Box>
       <Stack direction={"column"} gap={"2px"}>
         <OneLineTypography

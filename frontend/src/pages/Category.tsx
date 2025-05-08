@@ -9,16 +9,20 @@ import { useParams } from "react-router-dom";
 export default function SearchResultPage() {
   const { categorySlug1, categorySlug2 } = useParams();
 
-  const { data: category } = useQuery({
+  const { data: resData } = useQuery({
     queryKey: ["category", categorySlug1, categorySlug2],
     queryFn: () => getCategoryBySlug(categorySlug1 || "", categorySlug2),
   });
 
-  const { data, isLoading } = useQuery({
+  const category = resData?.data;
+
+  const { data: res, isLoading } = useQuery({
     queryKey: ["courses", category?._id],
     queryFn: () => getCoursesByCategoryId(category?._id || ""),
     enabled: !!category?._id,
   });
+
+  const data = res?.data || [];
 
   return (
     <>

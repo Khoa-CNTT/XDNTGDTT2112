@@ -10,10 +10,12 @@ export default function SearchResultPage() {
 
   const query = searchParams.get("query");
 
-  const { data, isLoading } = useQuery({
+  const { data: res, isLoading } = useQuery({
     queryKey: ["search", query],
     queryFn: () => getCoursesByQuery(query as string),
   });
+
+  const data = res?.data || [];
 
   return (
     <>

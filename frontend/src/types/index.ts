@@ -23,7 +23,7 @@ export type Course = {
   thumbnail: string;
   instructorId: string;
   categoryId: string;
-  level: string;
+  level: "beginner" | "intermediate" | "expert" | "all";
   duration: number;
   requirements: string;
   whatYouWillLearn: string;

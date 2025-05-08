@@ -497,6 +497,13 @@ const CourseService = {
 
     return courses;
   },
+  getCoursesByInstructorId: async function (instructorId: string) {
+    const courses = await Course.find({
+      instructorId,
+    }).populate("instructor category");
+
+    return courses;
+  },
 };
 
 export default CourseService;

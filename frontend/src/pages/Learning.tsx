@@ -7,12 +7,15 @@ import Category from "../components/learning/Category";
 import LessonNavigation from "../components/learning/LessonNavigation";
 import Notes from "@components/learning/Notes";
 import { useLearning } from "@/hooks/useLearning";
+import { useRef } from "react";
 
 export default function LearningPage() {
+  const playerRef = useRef<HTMLVideoElement | null>(null);
+
   const {
     data,
     refetch,
-    playerRef,
+    currentLesson,
     lessonId,
     comments,
     notes,
@@ -29,6 +32,12 @@ export default function LearningPage() {
         <Stack direction={"row"} gap={2}>
           <Box sx={{ flexGrow: 1 }}>
             <VideoPlayer
+              handleClickNextLesson={handleClickNextLesson}
+              lastWatchPosition={
+                currentLesson?.progress?.[0]?.lastWatchPosition
+              }
+              progressId={currentLesson?.progress?.[0]?._id}
+              refetch={refetch}
               ref={playerRef}
               // publicId={currentLesson.videoUrl}
               // publicId={"videos/sskgoahpg0bmoshkfwuc"}

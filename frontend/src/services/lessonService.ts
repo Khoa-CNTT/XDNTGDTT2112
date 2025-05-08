@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "@/configs/axiosConfig";
 
 interface UpdatedProgress {
@@ -12,8 +11,8 @@ export const updateProgressLesson = async (
 ) => {
   try {
     const response = await axios.put(`/lesson-progresses/${id}`, data);
-    return response as any;
+    return response.data;
   } catch (error) {
-    return error;
+    console.log(error);
   }
 };

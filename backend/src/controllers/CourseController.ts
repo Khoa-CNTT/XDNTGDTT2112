@@ -122,7 +122,10 @@ const CourseController = {
 
       const course = await CourseService.getCourseBySlug(slug);
       const reviews = await ReviewService.getAllReviewsByCourseId(course._id);
-      const lessons = await LessonService.getAllLessonsByCourseId(course._id);
+      const lessons = await LessonService.getAllLessonsByCourseId(
+        course._id,
+        existedUser._id.toString()
+      );
       const notes = await NoteService.getAllNotesByCourseIdAndUserId(
         course._id,
         existedUser._id.toString()

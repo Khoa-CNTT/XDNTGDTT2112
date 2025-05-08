@@ -2,13 +2,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 // Types
-import { User } from "@/types";
-import { EnrollmentType } from "../../../../backend/src/models/Enrollment";
+import { Enrollment, User } from "@/types";
 
 export interface AccountState {
   isLoggedIn: boolean;
   user: User | null;
-  enrollments: EnrollmentType[];
+  enrollments: Enrollment[];
 }
 
 const initialState: AccountState = {

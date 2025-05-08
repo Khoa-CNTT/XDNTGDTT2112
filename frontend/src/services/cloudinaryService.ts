@@ -9,6 +9,6 @@ export const uploadFileToCloudinary = async (data: FormData) => {
     });
     return response.data;
   } catch (error) {
-    return error;
+    console.error(error);
   }
 };

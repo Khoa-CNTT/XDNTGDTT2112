@@ -85,7 +85,7 @@ const router = createBrowserRouter([
         path: "/my-learning",
         lazy: async () => {
           const { default: Component } = await import(
-            "@pages/PurchasedCourses"
+            "@/pages/my-learning/MyLearning"
           );
           return { Component };
         },

@@ -151,7 +151,6 @@ const Login: React.FC = () => {
         toast.error("Đã xảy ra lỗi!");
         return;
       }
-
       if (dataRes.statusCode !== 200) {
         if (dataRes?.errors?.email) toast.error(dataRes.errors.email.message);
         else if (dataRes?.errors?.password)

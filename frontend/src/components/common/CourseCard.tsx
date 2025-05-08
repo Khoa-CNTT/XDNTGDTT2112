@@ -14,7 +14,11 @@ import { Box, Button, Rating, Stack, Tooltip, Typography } from "@mui/material";
 import { Course } from "@/types";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { addCourseToCart, cartSelector } from "@/features/cart";
-import { enrollmentsSelector, isLoggedInSelector } from "@/features/account";
+import {
+  enrollmentsSelector,
+  isLoggedInSelector,
+  userSelector,
+} from "@/features/account";
 import { Link } from "react-router-dom";
 import { addToCart } from "@/services/cartService";
 import { toast } from "react-toastify";
@@ -26,6 +30,7 @@ export default function Card({ course }: Props) {
   const enrollments = useAppSelector(enrollmentsSelector);
 
   const isLoggedIn = useAppSelector(isLoggedInSelector);
+  const user = useAppSelector(userSelector);
 
   const { courses } = useAppSelector(cartSelector);
 
@@ -85,7 +90,10 @@ export default function Card({ course }: Props) {
             overflow: "hidden",
           }}
         >
-          <Image src={"/images/image-placeholder.png"} fill />
+          <Image
+            src={course.thumbnail || "/images/image-placeholder.png"}
+            fill
+          />
         </Box>
         <TwoLineTypography
           sx={{ maxWidth: "100%", height: "40px", fontSize: "1rem" }}
@@ -133,13 +141,13 @@ export default function Card({ course }: Props) {
               </Typography>
             )}
           </Box>
-          {!isEnrolled && !isInCart && (
+          {user?.role !== "admin" && !isEnrolled && !isInCart && (
             <Button onClick={handleAddToCart} variant="text" sx={{ gap: 1 }}>
               <AddShoppingCartIcon />
               <Typography>Giỏ hàng</Typography>
             </Button>
           )}
-          {isEnrolled && (
+          {isEnrolled && user?.role !== "admin" && (
             <Link
               to={`/learning${course.slug}`}
               style={{ textDecoration: "none" }}
@@ -150,7 +158,7 @@ export default function Card({ course }: Props) {
               </Button>
             </Link>
           )}
-          {isInCart && (
+          {isInCart && user?.role !== "admin" && (
             <Link to={`/cart`} style={{ textDecoration: "none" }}>
               <Button variant="text" sx={{ gap: 1 }}>
                 <ShoppingCartCheckoutIcon />

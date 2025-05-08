@@ -35,8 +35,8 @@ export default function RootLayout() {
 
     async function fetchEnrollmentsAndSyncCart() {
       try {
-        const enrollments = await getEnrollments();
-        dispatch(setEnrollments(enrollments ?? []));
+        const res = await getEnrollments();
+        dispatch(setEnrollments(res.data ?? []));
       } catch (error) {
         console.error(error);
       }
@@ -50,9 +50,9 @@ export default function RootLayout() {
 
     async function fetchCart() {
       try {
-        const newCart = ((await getCart()) as any[])
-          ?.map((item) => item.course?.[0])
-          .filter((item) => item !== undefined);
+        const newCart = (await getCart()).data
+          ?.map((item: any) => item.course?.[0])
+          .filter((item: any) => item !== undefined);
         dispatch(replaceCart(newCart ?? []));
       } catch (error) {
         console.error(error);

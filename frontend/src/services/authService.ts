@@ -19,16 +19,12 @@ interface RegisterResponse extends CommonResponse {
   errors?: Record<string, { field: string; message: string }>;
 }
 
-interface VerifyTokenResponse extends CommonResponse {
-  data?: User;
-}
-
-export const login = async (data: object): Promise<LoginResponse> => {
+export const login = async (data: object) => {
   try {
-    const result = (await axios.post("/login", data)) as LoginResponse;
-    return result;
+    const result = await axios.post("/login", data);
+    return result.data as LoginResponse;
   } catch (error) {
-    return error as LoginResponse;
+    console.error("Error during login:", error);
   }
 };
 
@@ -37,24 +33,24 @@ export const register = async (data: object) => {
     const result = (await axios.post("/register", data)) as RegisterResponse;
     return result.data;
   } catch (error) {
-    return error as RegisterResponse;
+    console.error("Error during registration:", error);
   }
 };
 
-export const verifyToken = async (): Promise<VerifyTokenResponse> => {
+export const verifyToken = async () => {
   try {
-    const data = (await axios.post("/verify-token")) as VerifyTokenResponse;
-    return data;
+    const res = await axios.post("/verify-token");
+    return res.data;
   } catch (error) {
-    return error as VerifyTokenResponse;
+    console.error("Error verifying token:", error);
   }
 };
 
 export const logout = async () => {
   try {
-    const result = (await axios.post("/logout")) as CommonResponse;
-    return result;
+    const res = await axios.post("/logout");
+    return res.data;
   } catch (error) {
-    return error as CommonResponse;
+    console.error("Error logging out:", error);
   }
 };

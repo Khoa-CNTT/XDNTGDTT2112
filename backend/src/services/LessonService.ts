@@ -10,6 +10,7 @@ import serverResponse from "../utils/helpers/responses.js";
 // Messages
 import messages from "../configs/messagesConfig.js";
 import CommentService from "./CommentService.js";
+import LessonProgress from "../models/LessonProgress.js";
 
 // Types
 type LessonCreateInput = Pick<
@@ -28,17 +29,24 @@ const LessonService = {
       .sort({ createdAt: -1 });
     return lessons;
   },
-  getAllLessonsByCourseId: async function (courseId: string) {
+  getAllLessonsByCourseId: async function (courseId: string, userId?: string) {
     const lessons = await Lesson.find({ courseId })
       .populate({
-        path: "course comments progress",
+        path: "course comments",
       })
-      .sort({ orderIndex: 1 });
+      .sort({ orderIndex: 1 })
+      .lean();
 
     for await (const lesson of lessons) {
       const comments = await CommentService.getAllCommentsByLessonId(
         lesson._id.toString()
       );
+      if (userId) {
+        (lesson as any).progress = await LessonProgress.find({
+          lessonId: lesson._id,
+          userId: userId,
+        });
+      }
       (lesson as any).comments = comments;
     }
 

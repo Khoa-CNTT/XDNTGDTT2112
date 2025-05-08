@@ -30,7 +30,11 @@ import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { addCourseToCart, cartSelector } from "@/features/cart";
-import { enrollmentsSelector, isLoggedInSelector } from "@/features/account";
+import {
+  enrollmentsSelector,
+  isLoggedInSelector,
+  userSelector,
+} from "@/features/account";
 import { addToCart } from "@/services/cartService";
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -38,7 +42,7 @@ import { createReview } from "@/services/reviewService";
 
 export default function CourseDetails() {
   const { course, reviews, lessons } = useLoaderData();
-
+  const user = useAppSelector(userSelector);
   // Add this inside your component before the return statement
   const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState<string>("");
@@ -138,6 +142,8 @@ export default function CourseDetails() {
     return dateB.getTime() - dateA.getTime(); // Sort in descending order
   });
 
+  const isAuthor = user?._id === course?.instructorId;
+
   return (
     <>
       <Section sx={{ mt: "128px", mb: "128px" }}>
@@ -153,7 +159,7 @@ export default function CourseDetails() {
                 overflow: "hidden",
               }}
             >
-              <Image src={"/images/image-placeholder.png"} fill />
+              <Image src={thumbnail || "/images/image-placeholder.png"} fill />
             </Box>
 
             <Stack spacing={3} sx={{ width: { xs: "100%", md: "50%" } }}>
@@ -206,7 +212,7 @@ export default function CourseDetails() {
               </Stack>
 
               <Stack direction="row" spacing={2} alignItems="center">
-                {discountPrice > 0 ? (
+                {!isEnrolled && discountPrice > 0 ? (
                   <>
                     <Typography variant="h5" color="error">
                       {discountPrice.toLocaleString("vi-VN")}đ
@@ -222,12 +228,14 @@ export default function CourseDetails() {
                     </Typography>
                   </>
                 ) : (
-                  <Typography variant="h5">
-                    {price.toLocaleString("vi-VN")}đ
-                  </Typography>
+                  !isEnrolled && (
+                    <Typography variant="h5">
+                      {price.toLocaleString("vi-VN")}đ
+                    </Typography>
+                  )
                 )}
               </Stack>
-              {!isEnrolled && !isInCart && (
+              {user?.role !== "admin" && !isEnrolled && !isInCart && (
                 <Button
                   onClick={handleAddToCart}
                   variant="contained"
@@ -241,7 +249,7 @@ export default function CourseDetails() {
                   Thêm vào giỏ hàng
                 </Button>
               )}
-              {isEnrolled && (
+              {user?.role !== "admin" && isEnrolled && (
                 <Button
                   onClick={handleViewCourse}
                   variant="contained"
@@ -255,7 +263,7 @@ export default function CourseDetails() {
                   Xem khoá học
                 </Button>
               )}
-              {isInCart && (
+              {user?.role !== "admin" && isInCart && (
                 <Button
                   onClick={handleGoToCart}
                   variant="contained"
@@ -380,7 +388,7 @@ export default function CourseDetails() {
             </Typography>
 
             {/* Write Review Section */}
-            {isEnrolled && (
+            {isEnrolled && !isAuthor && (
               <Paper
                 elevation={0}
                 sx={{

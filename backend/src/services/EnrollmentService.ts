@@ -9,6 +9,7 @@ import messages from "../configs/messagesConfig.js";
 
 // Services
 import UserService from "./UserService.js";
+import CourseService from "./CourseService.js";
 
 // Types
 
@@ -21,7 +22,17 @@ const EnrollmentService = {
         .populate({
           path: "user course payment",
         })
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
+
+      for await (const enrollment of enrollments) {
+        const courseId = (enrollment as any).course?.[0]?._id?.toString();
+        const course = await CourseService.getCourseById(courseId);
+        if (course) {
+          (enrollment as any).course = [course];
+        }
+      }
+
       return enrollments;
     } catch (error) {
       throw serverResponse.createError({

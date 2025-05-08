@@ -9,9 +9,8 @@ export interface ReviewSubmission {
 export async function createReview(review: ReviewSubmission) {
   try {
     const response = await axios.post(`/reviews`, review);
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error creating review:", error);
-    throw error;
   }
 }

@@ -1,30 +1,29 @@
 import axios from "@/configs/axiosConfig";
-import { CartItem } from "@/types";
 
 export const getCart = async () => {
   try {
     const response = await axios.get("/cart");
-    return response.data as CartItem[];
+    return response.data;
   } catch (error) {
-    return error;
+    console.error("Error", error);
   }
 };
 
 export const addToCart = async (courseId: string) => {
   try {
     const response = await axios.post("/cart", { courseId });
-    return response;
+    return response.data;
   } catch (error) {
-    return error;
+    console.error("Error", error);
   }
 };
 
 export const removeFromCart = async (courseId: string) => {
   try {
     const response = await axios.delete(`/cart/${courseId}`);
-    return response;
+    return response.data;
   } catch (error) {
-    return error;
+    console.error("Error", error);
   }
 };
 
@@ -40,8 +39,8 @@ export const addMultipleToCart = async (
         signal: signal,
       }
     );
-    return response;
+    return response.data;
   } catch (error) {
-    return error;
+    console.error("Error adding multiple courses to cart:", error);
   }
 };
