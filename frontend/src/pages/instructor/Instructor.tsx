@@ -20,7 +20,7 @@ const coursesData: Course[] = [
     price: 699000,
     discountPrice: 499000,
     averageRating: 4.5,
-    thumbnail: 'https://example.com/images/nodejs-express-api.jpg',
+    thumbnail: 'https://th.bing.com/th/id/OIP.X0lQPk0QnmYgT_T9yW64NwHaEK?rs=1&pid=ImgDetMain',
     author: {
       _id: '6432f506c0e05609b48cef5a',
       email: 'tuan.nguyen@example.com',
@@ -55,7 +55,7 @@ const coursesData: Course[] = [
     price: 899000,
     discountPrice: 649000,
     averageRating: 3.5,
-    thumbnail: 'https://example.com/images/docker-kubernetes.jpg',
+    thumbnail: 'https://th.bing.com/th/id/OIP.X0lQPk0QnmYgT_T9yW64NwHaEK?rs=1&pid=ImgDetMain',
     author: {
       _id: '6445d8f2c73e21b5a9f6c4d3',
       email: 'hoang.pham@example.com',
@@ -90,7 +90,7 @@ const coursesData: Course[] = [
     price: 799000,
     discountPrice: 599000,
     averageRating: 5,
-    thumbnail: 'https://example.com/images/flutter-course.jpg',
+    thumbnail: 'https://th.bing.com/th/id/OIP.X0lQPk0QnmYgT_T9yW64NwHaEK?rs=1&pid=ImgDetMain',
     author: {
       _id: '644a1e7f89b2d3c5a6f7e8d9',
       email: 'thu.le@example.com',
