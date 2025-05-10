@@ -166,7 +166,9 @@ const Profile: React.FC = () => {
                   : profile.avatar || undefined
               }
               sx={{ width: 120, height: 120 }}
-            />
+            >
+              <Typography variant="h3">{profile.name[0]}</Typography>
+            </Avatar>
             {isEditing && (
               <IconButton
                 color="primary"

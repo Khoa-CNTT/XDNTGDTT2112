@@ -13,6 +13,7 @@
     "axios": "^1.8.1",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.5.1",
+    "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -26,6 +27,7 @@
     "openai": "^4.96.0",
     "redis": "^4.7.0",
     "slugify": "^1.6.6",
+    "socket.io": "^4.8.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

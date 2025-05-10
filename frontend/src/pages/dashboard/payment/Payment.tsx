@@ -15,6 +15,7 @@ import {
   import AddIcon from '@mui/icons-material/Add';
   import EditIcon from '@mui/icons-material/Edit';
   import DeleteIcon from '@mui/icons-material/Delete';
+  import { toast } from 'react-toastify';
   
   type Payment = {
     _id: string;
@@ -64,7 +65,7 @@ import {
         const data = await res.json();
         if (res.ok) setPayments(data.data);
       } catch (err) {
-        console.error('Lỗi khi tải dữ liệu thanh toán:', err);
+        toast.error('Lỗi khi tải dữ liệu thanh toán:', { position: 'top-right' });
       }
     };
   
@@ -85,16 +86,16 @@ import {
             paymentMethod: form.paymentMethod,
             paymentDetails: {
               vnp_OrderInfo: form.vnp_OrderInfo,
-              vnp_Amount: '',
-              vnp_BankCode: '',
-              vnp_BankTranNo: '',
-              vnp_CardType: '',
-              vnp_PayDate: '',
-              vnp_ResponseCode: '',
-              vnp_TmnCode: '',
-              vnp_TransactionNo: '',
-              vnp_TransactionStatus: '',
-              vnp_TxnRef: '',
+              vnp_Amount: (parseFloat(form.amount) * 1000).toString(),
+              vnp_BankCode: 'NCB',
+              vnp_BankTranNo: 'VNP123456',
+              vnp_CardType: 'ATM',
+              vnp_PayDate: new Date().toISOString().slice(0, 19).replace(/[-T:]/g, ''),
+              vnp_ResponseCode: '00',
+              vnp_TmnCode: '5K44SUPV',
+              vnp_TransactionNo: '14936338',
+              vnp_TransactionStatus: '00',
+              vnp_TxnRef: form.transactionId,
             }
           }),
         });
@@ -105,9 +106,10 @@ import {
           setForm({ userId: '', amount: '', transactionId: '', paymentMethod: '', vnp_OrderInfo: '' });
         }
       } catch (err) {
-        console.error('Lỗi thêm thanh toán:', err);
+        toast.error('Lỗi thêm thanh toán:', { position: 'top-right' });
       }
     };
+    
   
     const handleEditSave = async () => {
       if (!editPayment) return;
@@ -138,7 +140,7 @@ import {
           setEditPayment(null);
         }
       } catch (err) {
-        console.error('Lỗi cập nhật thanh toán:', err);
+        toast.error('Lỗi cập nhật thanh toán:');
       }
     };
   
@@ -152,17 +154,19 @@ import {
           setPayments((prev) => prev.filter((p) => p._id !== id));
         }
       } catch (err) {
-        console.error('Lỗi xóa thanh toán:', err);
+        toast.error('Lỗi xóa thanh toán:');
       }
     };
   
     const columns: GridColDef[] = [
       { field: 'id', headerName: 'ID', width: 70 },
-    //   { field: 'userId', headerName: 'ID người dùng', flex: 1 },
-      { field: 'amount', headerName: 'Số tiền', flex: 1 },
+      { field: 'amount', headerName: 'Số tiền (VNĐ)', flex: 1 },
+      // { field: 'vnp_Amount', headerName: 'VNPay Số tiền', flex: 1 },
       { field: 'paymentMethod', headerName: 'Phương thức', flex: 1 },
       { field: 'transactionId', headerName: 'Mã giao dịch', flex: 1 },
-      { field: 'orderInfo', headerName: 'Thông tin đơn hàng', flex: 1 },
+      { field: 'vnp_OrderInfo', headerName: 'Thông tin đơn hàng', flex: 1 },
+      { field: 'vnp_BankCode', headerName: 'Ngân hàng', flex: 1 },
+      { field: 'vnp_CardType', headerName: 'Loại thẻ', flex: 1 },
       { field: 'createdAt', headerName: 'Ngày tạo', width: 150 },
       {
         field: 'actions',
@@ -192,13 +196,19 @@ import {
         },
       },
     ];
+    
+    
   
     const rows = payments.map((p, index) => ({
       id: index + 1,
       ...p,
-      orderInfo: p.paymentDetails.vnp_OrderInfo,
+      vnp_Amount: p.paymentDetails.vnp_Amount,
+      vnp_OrderInfo: p.paymentDetails.vnp_OrderInfo,
+      vnp_BankCode: p.paymentDetails.vnp_BankCode,
+      vnp_CardType: p.paymentDetails.vnp_CardType,
       createdAt: new Date(p.createdAt).toLocaleDateString(),
     }));
+    
   
     return (
       <Box p={3}>

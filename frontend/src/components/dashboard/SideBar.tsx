@@ -74,7 +74,7 @@ export default function SideBar({
           {/* Dashboard Link */}
           <ListItem
             component={NavLink}
-            to="/dashboard"
+            to="/dashboard/statistical"
             end
             onClick={handleCloseSideBar}
             sx={{
@@ -101,10 +101,14 @@ export default function SideBar({
             {!isCollapsed && (
               <ListItemText
                 primary="Bảng điều khiển"
-                primaryTypographyProps={{ fontSize: "14px", color: isDark ? "#fff" : "#000" }}
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  color: isDark ? "#fff" : "#000",
+                }}
               />
             )}
           </ListItem>
+
 
           {/* Quản lý Dropdown */}
           <ListItem
@@ -168,7 +172,7 @@ export default function SideBar({
                   primary="Quản lý người dùng"
                   primaryTypographyProps={{ fontSize: "14px", color: isDark ? "#fff" : "#000" }}
                 />
-                
+
               </ListItem>
 
               <ListItem

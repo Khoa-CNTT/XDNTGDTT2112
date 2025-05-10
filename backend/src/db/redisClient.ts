@@ -1,5 +1,5 @@
-import redis, { RedisClientType } from 'redis';
-import { Express } from 'express';
+import redis, { RedisClientType } from "redis";
+import { Express } from "express";
 
 // Đối tượng lưu trữ các client Redis
 const clients: {
@@ -11,49 +11,49 @@ const clients: {
 
 // Định nghĩa các trạng thái kết nối Redis
 const STATUS_CONNECTION = {
-  CONNECT: 'connect',
-  RECONNECTING: 'reconnecting',
-  READY: 'ready',
-  CLOSE: 'close',
-  END: 'end',
-  ERROR: 'error',
-  CONNECTION_ERROR: 'connectionError',
+  CONNECT: "connect",
+  RECONNECTING: "reconnecting",
+  READY: "ready",
+  CLOSE: "close",
+  END: "end",
+  ERROR: "error",
+  CONNECTION_ERROR: "connectionError",
 };
 
 // Hàm xử lý các sự kiện kết nối Redis
 const handleEventRedisClient = (client: RedisClientType) => {
   client.on(STATUS_CONNECTION.CONNECT, () => {
-    console.log('Redis client connected');
+    console.log("Redis client connected");
   });
   client.on(STATUS_CONNECTION.RECONNECTING, () => {
-    console.log('Redis client reconnecting');
+    console.log("Redis client reconnecting");
   });
 
   client.on(STATUS_CONNECTION.READY, () => {
-    console.log('Redis client ready');
+    console.log("Redis client ready");
   });
 
   client.on(STATUS_CONNECTION.CLOSE, () => {
-    console.log('Redis client close');
+    console.log("Redis client close");
   });
 
   client.on(STATUS_CONNECTION.END, () => {
-    console.log('Redis client end');
+    console.log("Redis client end");
   });
 
   client.on(STATUS_CONNECTION.ERROR, (error) => {
-    console.error('Redis client error', error);
+    console.error("Redis client error", error);
   });
 
   client.on(STATUS_CONNECTION.CONNECTION_ERROR, (error) => {
-    console.error('Redis client connection error', error);
+    console.error("Redis client connection error", error);
   });
 };
 
 // Hàm khởi tạo client Redis mặc định
 const initialRedis = async () => {
   const redisClient: RedisClientType = redis.createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    url: process.env.REDIS_URL || "redis://localhost:6379",
   });
 
   handleEventRedisClient(redisClient);
@@ -64,7 +64,7 @@ const initialRedis = async () => {
 };
 
 // Hàm lấy client Redis theo tên
-const getRedisClient = (name: string = 'default') => {
+const getRedisClient = (name: string = "default") => {
   if (!clients[name]) {
     throw new Error(`Redis client ${name} not initialized`);
   }
@@ -72,7 +72,7 @@ const getRedisClient = (name: string = 'default') => {
 };
 
 // Hàm kiểm tra kết nối Redis
-const checkRedisConnection = async (name: string = 'default') => {
+const checkRedisConnection = async (name: string = "default") => {
   try {
     const client = getRedisClient(name);
     await client.ping();
@@ -84,7 +84,7 @@ const checkRedisConnection = async (name: string = 'default') => {
 };
 
 // Hàm đóng client Redis
-const closeRedisClient = async (name: string = 'default') => {
+const closeRedisClient = async (name: string = "default") => {
   const client = clients[name];
   if (client) {
     try {
@@ -101,9 +101,8 @@ const closeRedisClient = async (name: string = 'default') => {
 };
 
 //
-const connect = async (app: Express) => {
+const connect = async () => {
   await initialRedis();
-  app.emit('redisReady');
 };
 
 const redisClient = {

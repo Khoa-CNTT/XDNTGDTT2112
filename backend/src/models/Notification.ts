@@ -23,6 +23,11 @@ const NotificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    to: {
+      enum: ["user", "admin", "instructor"],
+      type: String,
+      required: true,
+    },
   },
   {
     id: false,

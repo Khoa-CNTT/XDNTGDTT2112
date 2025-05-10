@@ -75,6 +75,7 @@ const NotificationController = {
         title,
         message,
         referenceUrl,
+        to: "user",
       });
 
       res.status(messages.CREATED.statusCode).json(
@@ -153,6 +154,7 @@ const NotificationController = {
           title,
           message,
           referenceUrl,
+          to: "user",
         });
 
       res.status(messages.OK.statusCode).json(

@@ -24,6 +24,7 @@ import { setEnrollments } from "@/features/account/accountSlice";
 import { getCart } from "@/services/cartService";
 import { replaceCart } from "@/features/cart";
 import ChatWidget from "@/components/chatbot/ChatWidget";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 export default function RootLayout() {
   const { themeMode } = useTheme();
@@ -66,26 +67,28 @@ export default function RootLayout() {
 
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ScrollRestoration />
-        <Header />
-        <Outlet />
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme={isDarkMode ? "dark" : "light"}
-          transition={Bounce}
-        />
-        <ChatWidget />
-      </ThemeProvider>
+      <NotificationProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <ScrollRestoration />
+          <Header />
+          <Outlet />
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme={isDarkMode ? "dark" : "light"}
+            transition={Bounce}
+          />
+          <ChatWidget />
+        </ThemeProvider>
+      </NotificationProvider>
     </>
   );
 }

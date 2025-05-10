@@ -1,26 +1,26 @@
-import mongoose from 'mongoose';
-import { Express } from 'express';
+import mongoose from "mongoose";
 
 const db = {
-  connect: function (app: Express) {
+  connect: async function () {
     const options = {
       maxPoolSize: 10,
     };
 
-    const connectWithRetry = () => {
-      mongoose
-        .connect(process.env.DB_CONNECTION_STRING as string, options)
-        .then(() => {
-          console.log('Connected to MongoDB');
-          app.emit('ready');
-        })
-        .catch((err) => {
-          console.log('Error connecting to MongoDB', err);
-          console.log('Retrying in 2 seconds');
-          setTimeout(connectWithRetry, 2000);
-        });
+    const connectWithRetry = async () => {
+      try {
+        await mongoose.connect(
+          process.env.DB_CONNECTION_STRING as string,
+          options
+        );
+        console.log("Connected to MongoDB");
+      } catch (error) {
+        console.log("Error connecting to MongoDB", error);
+        console.log("Retrying in 2 seconds");
+        setTimeout(connectWithRetry, 2000);
+      }
     };
-    connectWithRetry();
+
+    await connectWithRetry();
   },
 };
 

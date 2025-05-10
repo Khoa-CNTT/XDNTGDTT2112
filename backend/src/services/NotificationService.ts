@@ -13,7 +13,7 @@ import UserService from "./UserService.js";
 // Types
 type CreateNotificationInput = Pick<
   NotificationType,
-  "userId" | "title" | "message" | "referenceUrl"
+  "userId" | "title" | "message" | "referenceUrl" | "to"
 >;
 
 const NotificationService = {

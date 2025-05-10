@@ -1,5 +1,6 @@
 // Models
 import Course, { CourseType } from "../models/Course.js";
+import User from "../models/User.js";
 import Enrollment from "../models/Enrollment.js";
 import Review from "../models/Review.js";
 
@@ -13,8 +14,9 @@ import serverResponse from "../utils/helpers/responses.js";
 import messages from "../configs/messagesConfig.js";
 
 // Mongoose
-import mongoose, { set } from "mongoose";
 import CategoryService from "./CategoryService.js";
+import NotificationService from "./NotificationService.js";
+import { sendNotification } from "../socket/socket-io.js";
 
 // Types
 type CourseCreateInput = Pick<
@@ -336,7 +338,7 @@ const CourseService = {
   },
   updateCourseById: async function (
     id: string,
-    data: CourseCreateInput & { isPublished?: boolean }
+    data: CourseCreateInput & { isPublished?: boolean; userName: string }
   ) {
     const course = await Course.findById(id);
 
@@ -351,7 +353,7 @@ const CourseService = {
     const existedCourse = await Course.findOne({
       title: data.title,
       _id: { $ne: id },
-    });
+    }).populate("instructor");
 
     if (existedCourse) {
       throw serverResponse.createError({
@@ -383,6 +385,26 @@ const CourseService = {
     if (data.isPublished !== undefined) course.isPublished = data.isPublished;
 
     await course.save();
+
+    const enrollments = await Enrollment.find({
+      courseId: id,
+    }).populate("user");
+
+    for await (const enrollment of enrollments) {
+      const user = await User.findById(enrollment.userId);
+
+      if (user) {
+        const notification = await NotificationService.createNotification({
+          userId: user._id,
+          title: `Khoá học ${course.title} đã được cập nhật`,
+          message: `Cập nhật bởi ${data.userName}`,
+          referenceUrl: `/learning${course.slug}`,
+          to: "user",
+        });
+
+        sendNotification(user.email, notification);
+      }
+    }
 
     return course;
   },

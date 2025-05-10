@@ -75,7 +75,9 @@ export default function Profile() {
     <Box>
       <Tooltip title="Tài khoản">
         <IconButton onClick={handleClick} size="medium" color="inherit">
-          <Avatar sx={{ width: 32, height: 32 }}>{user?.name[0]}</Avatar>
+          <Avatar src={user?.avatarUrl} sx={{ width: 32, height: 32 }}>
+            {user?.name[0]}
+          </Avatar>
         </IconButton>
       </Tooltip>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>

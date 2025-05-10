@@ -3,6 +3,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import http from "http";
+import { Server } from "socket.io";
 
 // Importing db
 import db from "./db/index.js";
@@ -31,6 +33,7 @@ import NotificationRoutes from "./routes/NotificationRoutes.js";
 import AIRoutes from "./routes/AIRoutes.js";
 import EnrollmentRoutes from "./routes/EnrollmentRoutes.js";
 import PaymentRoutes from "./routes/PaymentRoutes.js";
+import { initSocket } from "./socket/socket-io.js";
 
 // Configuring dotenv
 dotenv.config();
@@ -38,20 +41,21 @@ dotenv.config();
 // Express app
 const app = express();
 
-// Connect to database
-db.connect(app);
-redisClient.connect(app);
-
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Create a http server from Express app
+const server = http.createServer(app);
+
+initSocket(server);
 
 // Routes
 app.use("/api", AuthRoutes);
@@ -80,11 +84,15 @@ app.use(defaultError);
 // Server
 const PORT = process.env.PORT || 3000;
 
-// Run if the database has connected
-app.on("ready", () => {
-  app.on("redisReady", () => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  });
-});
+async function start() {
+  try {
+    // Connect to database
+    await db.connect();
+    await redisClient.connect();
+    server.listen(PORT, () => console.log(`Server on ${PORT}`));
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+start();

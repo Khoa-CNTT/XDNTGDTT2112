@@ -138,8 +138,13 @@ const router = createBrowserRouter([
     element: <DashboardLayout />,
     children: [
       {
-        index: true,
-        element: <>Dash board helo</>,
+        path: "statistical",
+        lazy: async () => {
+          const { default: Component } = await import(
+            "@pages/dashboard/statistical/Statistical"
+          );
+          return { Component };
+        },
       },
       {
         path: "user-management",

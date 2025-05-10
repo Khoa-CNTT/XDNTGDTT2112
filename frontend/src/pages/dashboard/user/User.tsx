@@ -1,4 +1,3 @@
-// src/pages/UserTable.tsx
 import {
   Box,
   Typography,
@@ -22,6 +21,7 @@ import { useEffect, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { toast } from 'react-toastify';
 
 // Kiểu cho từng user
 type UserList = {
@@ -30,7 +30,7 @@ type UserList = {
   name: string;
   bio: string;
   avatarUrl: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'instructor';
   registerProvider: 'local' | 'google';
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
@@ -45,6 +45,16 @@ type GetAllUsersResponse = {
   data: UserList[];
 };
 
+// Kiểu cho form
+type UserForm = {
+  name: string;
+  email: string;
+  bio: string;
+  role: 'user' | 'admin' | 'instructor';
+  avatarUrl?: string;
+  password?: string;
+};
+
 export default function UserTable() {
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -52,21 +62,15 @@ export default function UserTable() {
   });
 
   const [editUser, setEditUser] = useState<UserList | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', email: '', bio: '' });
+  const [editForm, setEditForm] = useState<UserForm>({
+    name: '',
+    email: '',
+    bio: '',
+    role: 'user',
+  });
   const [users, setUsers] = useState<UserList[]>([]);
-
-  const handleEdit = (user: UserList) => {
-    setEditUser(user);
-    setEditForm({ name: user.name, email: user.email, bio: user.bio });
-  };
-
-  const handleFormChange = (field: keyof typeof editForm, value: string) => {
-    setEditForm({ ...editForm, [field]: value });
-  };
-
-  // Hàm này sẽ được gọi khi người dùng nhấn nút "Lưu" trong modal thêm người dùng
   const [addUserOpen, setAddUserOpen] = useState(false);
-  const [addForm, setAddForm] = useState({
+  const [addForm, setAddForm] = useState<UserForm>({
     name: '',
     email: '',
     password: '',
@@ -75,72 +79,113 @@ export default function UserTable() {
     avatarUrl: '',
   });
 
-
-
-  // Hàm này sẽ được gọi khi người dùng nhấn nút "Lưu" trong modal sửa người dùng
-  const handleSave = async () => {
-    if (!editUser) return;
-
-    const updatedUser = {
-      ...editUser,
-      name: editForm.name,
-      bio: editForm.bio,
-      // avatarUrl đã được cập nhật sẵn trong state nếu có thay đổi ảnh
-    };
-
-    try {
-      const response = await fetch(`http://localhost:3000/api/users/${editUser._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(updatedUser),
-      });
-
-      if (response.ok) {
-        // Cập nhật danh sách người dùng trong state
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user._id === updatedUser._id ? updatedUser : user
-          )
-        );
-        setEditUser(null); // Đóng modal
-      } else {
-        console.error('Lỗi cập nhật người dùng');
-      }
-    } catch (error) {
-      console.error('Lỗi kết nối API:', error);
-    }
+  const handleEdit = (user: UserList) => {
+    setEditUser(user);
+    setEditForm({
+      name: user.name,
+      email: user.email,
+      bio: user.bio,
+      role: user.role,
+    });
   };
 
-  // Hàm này sẽ được gọi khi người dùng nhấn nút "Thêm người dùng" trong modal thêm người dùng
-  const handleAddUser = async () => {
+  const handleFormChange = (field: keyof UserForm, value: string) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddFormChange = (field: keyof UserForm, value: string) => {
+    setAddForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Fetch users from API
+  const fetchUsers = async () => {
     try {
       const response = await fetch('http://localhost:3000/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(addForm),
       });
 
-      const data = await response.json();
-
+      const data: GetAllUsersResponse = await response.json();
       if (response.ok) {
-        setUsers((prev) => [...prev, data.data]); // Thêm user mới vào danh sách
-        setAddUserOpen(false); // Đóng modal
-        setAddForm({ name: '', email: '', password: '', role: 'user', bio: '', avatarUrl: '' }); // Reset form
+        setUsers(data.data);
       } else {
-        console.error('Lỗi thêm người dùng:', data.message);
+        console.error('Lỗi lấy danh sách người dùng:', data.message);
       }
     } catch (error) {
       console.error('Lỗi kết nối API:', error);
     }
   };
 
+  // Handle save (add or edit)
+  const handleSave = async () => {
+    const method = editUser ? 'PUT' : 'POST';
+    const url = editUser
+      ? `http://localhost:3000/api/users/${editUser._id}`
+      : 'http://localhost:3000/api/users';
 
+    const userData = editUser
+      ? {
+          email: editUser.email,
+          name: editForm.name,
+          bio: editForm.bio,
+          role: editForm.role,
+          avatarUrl: editUser.avatarUrl || '',
+        }
+      : {
+          ...addForm,
+          avatarUrl: addForm.avatarUrl || '',
+        };
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(userData),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`${method} lỗi: ${errorText}`);
+      }
+
+      // const data = await res.json();
+      toast.success(`${editUser ? 'Cập nhật' : 'Thêm'} người dùng thành công!`);
+      setEditUser(null);
+      setAddUserOpen(false);
+      setEditForm({ name: '', email: '', bio: '', role: 'user' });
+      setAddForm({ name: '', email: '', password: '', role: 'user', bio: '', avatarUrl: '' });
+      fetchUsers(); // Reload user list
+    } catch (error) {
+      console.error('Lỗi khi lưu người dùng:', error);
+      alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+    }
+  };
+
+  // Handle delete
+  const handleDelete = async (userId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setUsers(users.filter((user) => user._id !== userId));
+      } else {
+        console.error('Lỗi xóa người dùng');
+      }
+    } catch (error) {
+      console.error('Lỗi kết nối API:', error);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const rows = users.map((user, index) => ({
     id: index + 1,
@@ -159,7 +204,11 @@ export default function UserTable() {
       field: 'avatar',
       headerName: 'Avatar',
       width: 100,
-      renderCell: (params) => <Box display="flex" alignItems="center" height={1}><Avatar src={params.value} /></Box>,
+      renderCell: (params) => (
+        <Box display="flex" alignItems="center" height={1}>
+          <Avatar src={params.value} />
+        </Box>
+      ),
     },
     { field: 'name', headerName: 'Tên', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
@@ -185,72 +234,16 @@ export default function UserTable() {
             </IconButton>
           </Box>
         );
-      }
+      },
     },
   ];
 
-  //Call API to get all users
-  // useEffect để gọi API khi component được mount
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/users', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-
-          },
-          credentials: 'include'
-        });
-
-        const data: GetAllUsersResponse = await response.json();
-
-        if (response.ok) {
-          setUsers(data.data);
-        } else {
-          console.error('Lỗi lấy danh sách người dùng:', data.message);
-        }
-      } catch (error) {
-        console.error('Lỗi kết nối API:', error);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-  //Call API to delete user
-  const handleDelete = async (userId: string) => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
-
-      if (response.ok) {
-        setUsers(users.filter(user => user._id !== userId));
-      } else {
-        console.error('Lỗi xóa người dùng');
-      }
-    } catch (error) {
-      console.error('Lỗi kết nối API:', error);
-    }
-  };
-
-
   return (
     <Box p={3}>
-      <Typography variant="h5" mb={2}>
-        Quản lý người dùng
-      </Typography>
-
-
-      <Box mb={2} display="flex" justifyContent="flex-end" alignItems="center" >
-        {/* <Button onClick={setAddUserOpen(true)} variant='contained' sx={{ display: 'flex', alignItems: 'center', py: 1.3 }}> */}
+      <Typography variant="h5" mb={2}>Quản lý người dùng</Typography>
+      <Box mb={2} display="flex" justifyContent="flex-end" alignItems="center">
         <Button
-          variant='contained'
+          variant="contained"
           sx={{ display: 'flex', alignItems: 'center', py: 1.3 }}
           onClick={() => setAddUserOpen(true)}
         >
@@ -273,16 +266,9 @@ export default function UserTable() {
         <DialogTitle>Sửa người dùng</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
-            {/* Avatar preview và upload */}
             <Box display="flex" alignItems="center" gap={2}>
-              <Avatar
-                src={editUser?.avatarUrl}
-                sx={{ width: 56, height: 56 }}
-              />
-              <Button
-                variant="outlined"
-                component="label"
-              >
+              <Avatar src={editUser?.avatarUrl} sx={{ width: 56, height: 56 }} />
+              <Button variant="outlined" component="label">
                 Tải ảnh lên
                 <input
                   type="file"
@@ -303,42 +289,31 @@ export default function UserTable() {
                 />
               </Button>
             </Box>
-
-            {/* Tên */}
             <TextField
               fullWidth
               label="Tên"
               value={editForm.name}
               onChange={(e) => handleFormChange('name', e.target.value)}
             />
-
-            {/* Email - không cho chỉnh sửa */}
             <TextField
               fullWidth
               label="Email"
               value={editForm.email}
               disabled
             />
-
-            {/* Vai trò */}
             <FormControl fullWidth>
               <InputLabel id="role-label">Vai trò</InputLabel>
               <Select
                 labelId="role-label"
-                value={editUser?.role || ''}
+                value={editForm.role}
                 label="Vai trò"
-                onChange={(e) => {
-                  if (editUser) {
-                    setEditUser({ ...editUser, role: e.target.value as 'user' | 'admin' });
-                  }
-                }}
+                onChange={(e) => handleFormChange('role', e.target.value as 'user' | 'admin' | 'instructor')}
               >
                 <MenuItem value="user">Người dùng</MenuItem>
                 <MenuItem value="admin">Quản trị viên</MenuItem>
+                <MenuItem value="instructor">Giảng viên</MenuItem>
               </Select>
             </FormControl>
-
-            {/* Tiểu sử */}
             <TextField
               fullWidth
               label="Tiểu sử"
@@ -349,7 +324,6 @@ export default function UserTable() {
             />
           </Box>
         </DialogContent>
-
         <DialogActions>
           <Button onClick={() => setEditUser(null)}>Hủy</Button>
           <Button variant="contained" onClick={handleSave}>
@@ -358,13 +332,11 @@ export default function UserTable() {
         </DialogActions>
       </Dialog>
 
-
       {/* Dialog thêm người dùng */}
       <Dialog open={addUserOpen} onClose={() => setAddUserOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>Thêm người dùng</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
-            {/* Avatar upload */}
             <Box display="flex" alignItems="center" gap={2}>
               <Avatar src={addForm.avatarUrl} sx={{ width: 56, height: 56 }} />
               <Button variant="outlined" component="label">
@@ -386,59 +358,55 @@ export default function UserTable() {
                 />
               </Button>
             </Box>
-
             <TextField
               label="Tên"
               fullWidth
               value={addForm.name}
-              onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
+              onChange={(e) => handleAddFormChange('name', e.target.value)}
             />
-
             <TextField
               label="Email"
               fullWidth
               value={addForm.email}
-              onChange={(e) => setAddForm({ ...addForm, email: e.target.value })}
+              onChange={(e) => handleAddFormChange('email', e.target.value)}
             />
-
             <TextField
               label="Mật khẩu"
               fullWidth
               type="password"
               value={addForm.password}
-              onChange={(e) => setAddForm({ ...addForm, password: e.target.value })}
+              onChange={(e) => handleAddFormChange('password', e.target.value)}
             />
-
             <FormControl fullWidth>
               <InputLabel id="add-role-label">Vai trò</InputLabel>
               <Select
                 labelId="add-role-label"
                 value={addForm.role}
                 label="Vai trò"
-                onChange={(e) => setAddForm({ ...addForm, role: e.target.value })}
+                onChange={(e) => handleAddFormChange('role', e.target.value)}
               >
-                <MenuItem value="user">User</MenuItem>
-                <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="lecturer">Lecturer</MenuItem>
+                <MenuItem value="user">Người dùng</MenuItem>
+                <MenuItem value="admin">Quản trị viên</MenuItem>
+                <MenuItem value="instructor">Giảng viên</MenuItem>
               </Select>
             </FormControl>
-
             <TextField
               label="Tiểu sử"
               fullWidth
               multiline
               rows={3}
               value={addForm.bio}
-              onChange={(e) => setAddForm({ ...addForm, bio: e.target.value })}
+              onChange={(e) => handleAddFormChange('bio', e.target.value)}
             />
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAddUserOpen(false)}>Hủy</Button>
-          <Button variant="contained" onClick={handleAddUser}>Thêm</Button>
+          <Button variant="contained" onClick={handleSave}>
+            Thêm
+          </Button>
         </DialogActions>
       </Dialog>
-
     </Box>
   );
 }

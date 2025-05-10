@@ -175,3 +175,17 @@ export interface Note {
   lesson: Lesson[];
   course: Course[];
 }
+
+export interface Notification {
+  _id: string;
+  userId: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  referenceUrl: string;
+  to: User["role"];
+  createdAt: string;
+  updatedAt: string;
+  __v: 0;
+  user: User[];
+}
